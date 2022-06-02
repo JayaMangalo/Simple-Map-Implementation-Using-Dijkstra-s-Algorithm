@@ -19,7 +19,8 @@ class Graph():
             nodesrcname,nodedestname,weight = edge.split()
             self.nodes[nodesrcname].insertedge(nodedestname,weight)
 
-
+    def getnode(self,nodename):
+        return self.nodes[nodename]
 
     def printgraph(self):
         for key in self.nodes.keys():
@@ -36,10 +37,17 @@ class Node():
         self.name = name
         self.x = x 
         self.y = y
+
         self.edges = []
+        self.currentpath = []
 
     def insertedge(self,nodename,weight):
         self.edges.append([nodename,weight])
+
+    def isExplored(self):
+        if self.currentpath:
+            return True
+        return False
 
 def main():
     g = Graph()
