@@ -3,29 +3,34 @@ class Graph():
         self.nodes = {}
 
     def read(self,filename):
-        f = open("test/"+filename,"r")
+        try:
+            f = open(filename,"r")
 
-        nodeamount = int(f.readline())
-        for _ in range(nodeamount):
-            nodeinfo = f.readline()
-            nodename,x,y = nodeinfo.split()
-            if nodename not in self.nodes.keys():
-                node = Node(nodename,x,y)
-                self.nodes[nodename] = node
+            nodeamount = int(f.readline())
+            for _ in range(nodeamount):
+                nodeinfo = f.readline()
+                nodename,x,y = nodeinfo.split()
+                if nodename not in self.nodes.keys():
+                    node = Node(nodename,x,y)
+                    self.nodes[nodename] = node
 
-        edgeamount = int(f.readline())
-        for _ in range(edgeamount):
-            edge = f.readline()
-            nodesrcname,nodedestname,weight = edge.split()
-            self.nodes[nodesrcname].insertedge(nodedestname,weight)
+            edgeamount = int(f.readline())
+            for _ in range(edgeamount):
+                edge = f.readline()
+                nodesrcname,nodedestname,weight = edge.split()
+                self.nodes[nodesrcname].insertedge(nodedestname,weight)
+            return True
+        except:
+            return False
 
     def getnode(self,nodename):
         return self.nodes[nodename]
 
-    def printgraph(self):
+    def getgraphnodesname(self):
+        names = []
         for key in self.nodes.keys():
-            print(key, '->', self.nodes[key].name)
-
+            names.append(key)
+        return names
     def printedge(self):
         for key in self.nodes.keys():
             node = self.nodes[key]
@@ -51,7 +56,7 @@ class Node():
 
 def main():
     g = Graph()
-    g.read("test1.txt")
+    g.read("test/test1.txt")
     g.printgraph()
     g.printedge()
 

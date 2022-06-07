@@ -9,8 +9,6 @@ def DijkstraSearch(G: Graph,nodesrc : str , nodedst : str):
     NodeRoot = G.getnode(nodesrc)
     pq.put((0,NodeRoot,[NodeRoot.name]))
 
-    # print("put", NodeRoot.name ,"with weight",0)
-
     while(not pq.empty()):
         weight, node,path = pq.get()
         if node.name == nodedst:    #found
@@ -18,7 +16,6 @@ def DijkstraSearch(G: Graph,nodesrc : str , nodedst : str):
 
         if (node.isExplored()):     #check if nodetarget already explored
             continue
-        
 
         print("processed node",node.name,path)
         for edge in node.edges:
