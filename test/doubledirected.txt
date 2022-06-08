@@ -1,0 +1,32 @@
+10
+A 
+B
+C 
+D 
+E
+F
+G
+H
+I
+J
+20
+A B 2
+A C 3
+B D 4
+C D 5
+D E 6
+E F 3
+D F 4
+F G 2 
+G H 7 
+H J 8
+B A 9
+C A 2
+D B 2
+D C 3
+E D 4
+F E 5
+F D 1
+G F 7
+H G 8 
+J H 8

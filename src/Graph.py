@@ -9,9 +9,9 @@ class Graph():
             nodeamount = int(f.readline())
             for _ in range(nodeamount):
                 nodeinfo = f.readline()
-                nodename,x,y = nodeinfo.split()
+                nodename = nodeinfo.split()[0]
                 if nodename not in self.nodes.keys():
-                    node = Node(nodename,x,y)
+                    node = Node(nodename)
                     self.nodes[nodename] = node
 
             edgeamount = int(f.readline())
@@ -38,26 +38,23 @@ class Graph():
                 print(key, '->', edge)
 
 class Node():
-    def __init__(self,name,x,y):
+    def __init__(self,name):
         self.name = name
-        self.x = x 
-        self.y = y
-
         self.edges = []
-        self.currentpath = []
 
     def insertedge(self,nodename,weight):
         self.edges.append([nodename,weight])
 
-    def isExplored(self):
-        if self.currentpath:
-            return True
-        return False
+    def __lt__(self, other):
+        return True;
+    
+    def __le__(self, other):
+        return True;   
 
 def main():
     g = Graph()
     g.read("test/test1.txt")
-    g.printgraph()
+    print(g.getgraphnodesname())
     g.printedge()
 
 if __name__ == '__main__':

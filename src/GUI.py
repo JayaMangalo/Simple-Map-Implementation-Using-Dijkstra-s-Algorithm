@@ -1,9 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
-from Graph import *
+from Dijkstra import *
 import networkx as nx
 import matplotlib.pyplot as plt
+import time
+
 
 def select_files():
     filetypes = (
@@ -20,21 +22,56 @@ def select_files():
         loadfileintograph(filenames[0])
 
 def loadfileintograph(filenames):
-        g = Graph()
-        if(not g.read(filenames)):
-                return
-        print("ree")
+        global g
         global Loaded
         global myLabelStats 
-        Loaded = True
-        stats = "Loaded\n Available Nodes: " + str(g.getgraphnodesname())
-        myLabelStats = tk.Label(root,text = stats)
-        myLabelStats.grid(row = 7,column=0,pady=10,padx=20,columnspan=3)
-def displaygraph(g: Graph):
+        g = Graph()
+        if(not g.read(filenames)):
+                stats = "FAILED TO LOAD"
+                Loaded = False
+                myLabelStats["text"] = stats
+                return
+        else:   
+                stats = "Loaded"
+                Loaded = True  
+                myLabelStats["text"] = stats      
+
+        displaygraph([])
+
+def SolveButton():
+        src = myEntryFrom.get()
+        dest = myEntryTo.get()
+        global Loaded
+        if (Loaded and src and dest):
+                global g
+
+                start_time = time.time()
+                queued_nodes_amount,explored_nodes_amount,path,weight = DijkstraSearch(g,src,dest)
+                curtime = time.time()
+                searchtime = (curtime - start_time) * 1000
+
+                print("START TIME: "+ str(start_time))
+                print("END TIME: "+str(curtime))
+
+                global myLabelStats
+                if (path == "ERROR"):
+                        stats = "Invalid Input"
+                elif(path == "FAIL"):
+                        stats = "No Path Found\nSearch Time: "+str(searchtime)+"ms \nQueued Nodes: "+str(queued_nodes_amount)+"\nExplored Nodes: "+str(explored_nodes_amount)
+                else:   
+                        betterpath = path[0]
+                        for nodename in path[1:]:
+                                betterpath += "-"+nodename
+
+                        stats = "Search Successful\nSearch Time: "+str(searchtime)+"ms \nQueued Nodes: "+str(queued_nodes_amount)+"\nExplored Nodes: "+str(explored_nodes_amount)+"\nPath: "+str(betterpath)+"\nWeight: "+str(weight)
+                myLabelStats["text"] = stats
+                displaygraph(path)
+
+def displaygraph(path):
+        global g
         net = nx.DiGraph()
         for key in g.nodes.keys():
                 node = g.getnode(key)
-                print(node.name)
                 net.add_node(node.name)
 
         for key in g.nodes.keys():
@@ -44,17 +81,38 @@ def displaygraph(g: Graph):
         
         edge_labels=dict([((u,v,),d['weight']) for u,v,d in net.edges(data=True)])
 
-        pos=nx.spring_layout(net)
+        if path == "FAIL" and path!= "ERROR" and path!= []:
+                nodecolors = ['blue' for _ in range(len(net))]
+                edgecolors = ['blue' for _ in range(len(net.edges()))]
+
+        else:
+                nodecolors = []
+                for netnode in net:
+                        if netnode in path:
+                                nodecolors.append('yellow')
+                        else:
+                                nodecolors.append('blue')
+                edgecolors = []
+                for u,v in net.edges():
+                        if isEdgeinPath(u,v,path):
+                                edgecolors.append('yellow')
+                        else:
+                                edgecolors.append('blue')
+                
+
+        pos = nx.spring_layout(net, k=2, iterations=50,seed=1)
+        plt.cla() 
+        plt.clf() 
         nx.draw_networkx_edge_labels(net,pos,edge_labels=edge_labels)
-        nx.draw(net,pos,with_labels=True,arrows=True)
+        nx.draw(net,pos,with_labels=True,node_color = nodecolors,edge_color=edgecolors,arrows=True)
         plt.show()
-        plt.waitforbuttonpress()
 
-
-
-
-
-
+def isEdgeinPath(u,v,path):
+        for i in range(len(path)-1):
+                if path[i] == u and path[i+1] == v:
+                        return True
+        return False
+g = Graph()
 root = tk.Tk()
 root.title("15-Puzzle")
 # root.geometry('1000x600')
@@ -72,9 +130,10 @@ myEntryFrom.grid(row=1,column=0,pady=10,padx=10)
 myEntryTo = tk.Entry(root,text ="To",width=10)
 myEntryTo.grid(row=1,column=1,padx=10,pady=10)
 
-myButton = tk.Button(root,text = "Solve")
+myButton = tk.Button(root,text = "Solve",command=SolveButton)
 myButton.grid(row=1,column=3,pady=10)
 
+Loaded = False
 stats = "Not Yet Loaded"
 myLabelStats = tk.Label(root,text = stats)
 myLabelStats.grid(row = 7,column=0,pady=10,padx=20,columnspan=3)
